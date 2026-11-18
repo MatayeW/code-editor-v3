@@ -1,0 +1,417 @@
+/* shared pieces */
+.card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.card-heading {
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+}
+
+.card-heading h2,
+.card-heading h3 {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.count {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--muted);
+  background: var(--subtle);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.code {
+  font-family: "DM Mono", monospace;
+  font-size: 12.5px;
+  line-height: 22px;
+  word-break: break-all;
+}
+
+/* top bar */
+.topbar {
+  height: 64px;
+  padding: 0 42px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--accent-line);
+  border-radius: 9px;
+  color: var(--pass);
+  background: var(--accent-soft);
+  font-family: "DM Mono", monospace;
+  font-size: 12px;
+}
+
+.brand-accent {
+  color: var(--accent);
+}
+
+/* page */
+.page {
+  max-width: 1152px;
+  margin: 0 auto;
+  padding: 32px 42px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.page h1 {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.live-layout {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+/* problems received */
+.inbox-list {
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.inbox-item {
+  width: 100%;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px;
+  color: inherit;
+  background: transparent;
+  text-align: left;
+  font-size: 13px;
+}
+
+.inbox-item:hover,
+.inbox-item.selected {
+  background: var(--subtle);
+}
+
+.inbox-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.inbox-item.selected .inbox-title {
+  font-weight: 700;
+}
+
+.check {
+  color: var(--pass);
+  font-weight: 800;
+}
+
+.inbox-meta {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* selected problem */
+.work {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.problem-card {
+  padding: 20px;
+}
+
+.problem-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.title-row h2 {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+
+.sent-by {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.clock-box {
+  text-align: right;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.clock {
+  margin-top: 4px;
+  display: inline-block;
+  padding: 4px 10px;
+  border: 1px solid var(--amber-line);
+  border-radius: 6px;
+  color: var(--ink);
+  background: var(--amber-soft);
+  font-family: "DM Mono", monospace;
+  font-size: 20px;
+}
+
+.statement {
+  max-width: 65ch;
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.share-note {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.work-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 16px;
+  align-items: start;
+}
+
+/* editor */
+.editor-column {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.editor-card {
+  overflow: hidden;
+  border: 1px solid #2f2e45;
+  border-radius: 12px;
+  background: #202033;
+}
+
+.editor-header {
+  padding: 8px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #37364a;
+  background: #29283b;
+}
+
+.file-name {
+  padding-left: 4px;
+  color: #b9b7c7;
+  font-family: "DM Mono", monospace;
+  font-size: 12px;
+}
+
+.editor-actions {
+  margin-left: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btn {
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-run {
+  border: 1px solid #555268;
+  color: #d4d1dd;
+  background: #343247;
+}
+
+.btn-run:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.btn-submit {
+  border: 0;
+  color: #242038;
+  background: #a79cff;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: #b9b0ff;
+}
+
+/* the editor box can be resized: drag its bottom-right corner */
+.editor-body {
+  height: 360px;
+  min-height: 220px;
+  resize: vertical;
+  overflow: hidden;
+  background: #202033;
+}
+
+.console {
+  min-height: 100px;
+  padding: 12px 16px;
+  border-top: 1px solid #37364a;
+  background: #262538;
+}
+
+.console-title {
+  color: #8c89a6;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.console-lines {
+  margin-top: 4px;
+  color: #c9c7d4;
+  font-family: "DM Mono", monospace;
+  font-size: 12.5px;
+  line-height: 22px;
+}
+
+.status-line {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.status-line .pass {
+  color: var(--pass);
+}
+
+/* test results */
+.test-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.test-item {
+  padding: 12px 16px;
+  display: flex;
+  gap: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.test-item:first-child {
+  border-top: 0;
+}
+
+.test-mark {
+  width: 14px;
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.test-mark.pass {
+  color: var(--pass);
+}
+
+.test-mark.fail {
+  color: var(--fail);
+}
+
+.test-detail {
+  display: block;
+  margin-top: 2px;
+  color: var(--fail);
+  font-size: 12px;
+}
+
+/* smaller screens */
+@media (max-width: 1100px) {
+  .work-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .live-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .page,
+  .topbar {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
