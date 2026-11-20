@@ -1,5 +1,6 @@
 /* shared pieces */
 .card {
+  min-width: 0;
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -7,22 +8,34 @@
 }
 
 .card-heading {
-  padding: 14px 16px;
+  padding: 10px 12px 10px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--line);
 }
 
-.card-heading h2,
-.card-heading h3 {
+.card-heading h2 {
   font-size: 13px;
   font-weight: 700;
 }
 
-.count {
-  font-size: 13px;
-  font-weight: 700;
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--muted);
+  background: var(--surface);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.icon-btn:hover {
+  border-color: var(--accent);
+  color: var(--ink);
 }
 
 .tag {
@@ -43,13 +56,6 @@
   height: 8px;
   border-radius: 50%;
   background: var(--accent);
-}
-
-.code {
-  font-family: "DM Mono", monospace;
-  font-size: 12.5px;
-  line-height: 22px;
-  word-break: break-all;
 }
 
 /* top bar */
@@ -117,6 +123,11 @@
   align-items: start;
 }
 
+/* when the problems list is collapsed it becomes a slim rail */
+.live-layout.collapsed {
+  grid-template-columns: 52px minmax(0, 1fr);
+}
+
 /* problems received */
 .inbox-list {
   margin: 0;
@@ -165,6 +176,32 @@
   margin-top: 2px;
   color: var(--muted);
   font-size: 12px;
+}
+
+/* the collapsed rail: an expand button and one small button per problem */
+.rail {
+  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.rail-item {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.rail-item:hover,
+.rail-item.selected {
+  color: var(--ink);
+  background: var(--subtle);
 }
 
 /* selected problem */
@@ -240,14 +277,7 @@
   font-size: 12px;
 }
 
-.work-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 280px;
-  gap: 16px;
-  align-items: start;
-}
-
-/* editor */
+/* editor card: header, code, then the test panel underneath */
 .editor-column {
   min-width: 0;
   display: flex;
@@ -256,6 +286,7 @@
 }
 
 .editor-card {
+  min-width: 0;
   overflow: hidden;
   border: 1px solid #2f2e45;
   border-radius: 12px;
@@ -320,28 +351,118 @@
 
 /* the editor box can be resized: drag its bottom-right corner */
 .editor-body {
-  height: 360px;
+  height: 340px;
   min-height: 220px;
   resize: vertical;
   overflow: hidden;
   background: #202033;
 }
 
-.console {
-  min-height: 100px;
-  padding: 12px 16px;
+/* test cases + console, under the editor */
+.test-panel {
+  height: 230px;
+  display: flex;
+  flex-direction: column;
   border-top: 1px solid #37364a;
+  color: #b8b6c5;
   background: #262538;
 }
 
-.console-title {
-  color: #8c89a6;
-  font-size: 11px;
+.test-heading {
+  flex: 0 0 auto;
+  height: 40px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid #37364a;
+}
+
+.test-heading button {
+  border: 0;
+  color: #757386;
+  background: transparent;
+  font-size: 12px;
+}
+
+.test-heading button.active {
+  color: #e0deea;
+}
+
+.test-count {
+  margin-left: auto;
+  color: #8f8ca3;
+  font-size: 12px;
   font-weight: 700;
 }
 
+.test-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.test-tabs {
+  display: flex;
+  gap: 5px;
+  padding: 12px 14px 8px;
+}
+
+.test-tabs button {
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 4px;
+  color: #7f7d8e;
+  background: transparent;
+  font-size: 11px;
+}
+
+.test-tabs button.active {
+  color: #d5d2e3;
+  background: #3a384f;
+}
+
+.test-values {
+  display: grid;
+  grid-template-columns: 1fr 0.6fr 0.6fr;
+  gap: 8px;
+  padding: 0 14px 12px;
+}
+
+.test-values > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.test-values span {
+  color: #716f80;
+  font-size: 11px;
+}
+
+.test-values code {
+  overflow: hidden;
+  padding: 9px;
+  border-radius: 4px;
+  color: #c9c7d4;
+  background: #202033;
+  font-family: "DM Mono", monospace;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.test-values code.output-success {
+  color: #7ed3a9;
+}
+
+.test-values code.output-fail {
+  color: #f06ba5;
+}
+
 .console-lines {
-  margin-top: 4px;
+  padding: 12px 14px;
   color: #c9c7d4;
   font-family: "DM Mono", monospace;
   font-size: 12.5px;
@@ -357,56 +478,17 @@
   color: var(--pass);
 }
 
-/* test results */
-.test-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.test-item {
-  padding: 12px 16px;
-  display: flex;
-  gap: 12px;
-  border-top: 1px solid var(--line);
-}
-
-.test-item:first-child {
-  border-top: 0;
-}
-
-.test-mark {
-  width: 14px;
-  flex: 0 0 auto;
-  color: var(--muted);
-  font-weight: 700;
-}
-
-.test-mark.pass {
-  color: var(--pass);
-}
-
-.test-mark.fail {
-  color: var(--fail);
-}
-
-.test-detail {
-  display: block;
-  margin-top: 2px;
-  color: var(--fail);
-  font-size: 12px;
-}
-
 /* smaller screens */
-@media (max-width: 1100px) {
-  .work-grid {
+@media (max-width: 900px) {
+  .live-layout,
+  .live-layout.collapsed {
     grid-template-columns: 1fr;
   }
-}
 
-@media (max-width: 900px) {
-  .live-layout {
-    grid-template-columns: 1fr;
+  .rail {
+    padding: 8px 12px;
+    flex-direction: row;
+    justify-content: flex-start;
   }
 
   .page,

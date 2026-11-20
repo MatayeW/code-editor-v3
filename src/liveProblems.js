@@ -1,6 +1,7 @@
 // Problems your mentor "sends" during a live session.
 // Newest first, like the Problems received list in the wireframe.
-// Each input is the list of arguments passed to the function.
+// Each input is the list of arguments passed to the function,
+// and params are the names of those arguments (used to show "sentence = ...").
 const liveProblems = [
   {
     id: 1,
@@ -12,6 +13,7 @@ const liveProblems = [
     statement:
       "Write reverseWords(sentence). It returns the sentence with the order of the words reversed. Words are separated by single spaces.",
     functionName: "reverseWords",
+    params: ["sentence"],
     starterCode:
       'function reverseWords(sentence) {\n  // your code here\n}\n\nconsole.log(reverseWords("get seen get hired"));',
     tests: [
@@ -30,6 +32,7 @@ const liveProblems = [
     statement:
       "Write largest(numbers). It returns the biggest number in the array. The array always has at least one number.",
     functionName: "largest",
+    params: ["numbers"],
     starterCode:
       "function largest(numbers) {\n  // your code here\n}\n\nconsole.log(largest([3, 9, 2]));",
     tests: [
@@ -48,6 +51,7 @@ const liveProblems = [
     statement:
       "Write isPalindrome(word). It returns true if the word reads the same forwards and backwards, otherwise false.",
     functionName: "isPalindrome",
+    params: ["word"],
     starterCode:
       'function isPalindrome(word) {\n  // your code here\n}\n\nconsole.log(isPalindrome("level"));',
     tests: [
@@ -57,6 +61,8 @@ const liveProblems = [
     ],
     // this one is already handed in, so you can see the Submitted state
     submittedResult: "3/3 tests passed · 4m 12s used",
+    submittedCode:
+      'function isPalindrome(word) {\n  return word === word.split("").reverse().join("");\n}\n\nconsole.log(isPalindrome("level"));',
   },
 ];
 

@@ -36,9 +36,9 @@ function show(value) {
   return value === undefined ? "undefined" : JSON.stringify(value);
 }
 
-// ["level up"] becomes "level up", [[1, 2]] becomes [1,2]
-function formatInput(input) {
-  return input.map((arg) => show(arg)).join(", ");
+// ["level up"] with params ["sentence"] becomes: sentence = "level up"
+function formatInput(input, params) {
+  return input.map((arg, i) => params[i] + " = " + show(arg)).join(", ");
 }
 
 // 75 seconds becomes "01:15"
@@ -91,15 +91,21 @@ function App() {
   const [problems, setProblems] = useState(
     liveProblems.map((p) => ({
       ...p,
-      code: p.starterCode,
+      code: p.submittedCode || p.starterCode,
       left: p.mins * 60, // seconds left on the clock
       status: p.submittedResult ? "Submitted" : "Solving",
       result: p.submittedResult || "",
-      testResults: null,
+      // a problem that is already handed in shows all its tests as passed
+      testResults: p.submittedResult
+        ? p.tests.map((t) => ({ passed: true, shown: show(t.expected) }))
+        : null,
       consoleLines: [],
     }))
   );
   const [selectedId, setSelectedId] = useState(liveProblems[0].id);
+  const [inboxOpen, setInboxOpen] = useState(true); // problems list open or collapsed
+  const [bottomTab, setBottomTab] = useState("tests"); // "tests" or "console"
+  const [activeCase, setActiveCase] = useState(0);
 
   // every second, take one second off each problem that is still being solved
   useEffect(() => {
@@ -115,6 +121,10 @@ function App() {
 
   const problem = problems.find((p) => p.id === selectedId);
   const isSubmitted = problem.status === "Submitted";
+  const activeTest = problem.tests[activeCase];
+  const activeResult = problem.testResults
+    ? problem.testResults[activeCase]
+    : null;
   const passedCount = problem.testResults
     ? problem.testResults.filter((r) => r.passed).length
     : 0;
@@ -126,9 +136,17 @@ function App() {
     );
   }
 
+  // pick a problem from the list
+  function selectProblem(id) {
+    setSelectedId(id);
+    setActiveCase(0);
+    setBottomTab("tests");
+  }
+
   // Run: show what the code prints
   function runCode() {
     updateProblem(problem.id, { consoleLines: captureConsole(problem.code) });
+    setBottomTab("console");
   }
 
   // Run tests: check the code against the test cases
@@ -136,6 +154,7 @@ function App() {
     updateProblem(problem.id, {
       testResults: runTests(problem.code, problem.functionName, problem.tests),
     });
+    setBottomTab("tests");
   }
 
   // Submit: run the tests, then lock the problem and record the time used
@@ -152,6 +171,7 @@ function App() {
       result:
         passed + "/" + results.length + " tests passed · " + minutes + "m " + secs + "s used",
     });
+    setBottomTab("tests");
   }
 
   return (
@@ -174,36 +194,73 @@ function App() {
           </p>
         </div>
 
-        <div className="live-layout">
-          {/* LEFT: problems received */}
+        <div className={"live-layout" + (inboxOpen ? "" : " collapsed")}>
+          {/* LEFT: problems received (can be collapsed) */}
           <div className="card">
-            <div className="card-heading">
-              <h2>Problems received</h2>
-            </div>
-            <ul className="inbox-list">
-              {problems.map((p) => (
-                <li key={p.id}>
+            {inboxOpen ? (
+              <>
+                <div className="card-heading">
+                  <h2>Problems received</h2>
                   <button
-                    className={
-                      "inbox-item" + (p.id === selectedId ? " selected" : "")
-                    }
-                    onClick={() => setSelectedId(p.id)}
+                    className="icon-btn"
+                    onClick={() => setInboxOpen(false)}
+                    aria-expanded="true"
+                    aria-label="Collapse problems list"
+                    title="Collapse"
                   >
-                    <span className="inbox-title">
-                      <span>{p.title}</span>
-                      {p.status === "Submitted" ? (
-                        <span className="check">✓</span>
-                      ) : (
-                        <span className="dot"></span>
-                      )}
-                    </span>
-                    <span className="inbox-meta">
-                      From {p.from} · {p.when} · {p.mins} min
-                    </span>
+                    ‹
                   </button>
-                </li>
-              ))}
-            </ul>
+                </div>
+                <ul className="inbox-list">
+                  {problems.map((p) => (
+                    <li key={p.id}>
+                      <button
+                        className={
+                          "inbox-item" + (p.id === selectedId ? " selected" : "")
+                        }
+                        onClick={() => selectProblem(p.id)}
+                      >
+                        <span className="inbox-title">
+                          <span>{p.title}</span>
+                          {p.status === "Submitted" ? (
+                            <span className="check">✓</span>
+                          ) : (
+                            <span className="dot"></span>
+                          )}
+                        </span>
+                        <span className="inbox-meta">
+                          From {p.from} · {p.when} · {p.mins} min
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <div className="rail">
+                <button
+                  className="icon-btn"
+                  onClick={() => setInboxOpen(true)}
+                  aria-expanded="false"
+                  aria-label="Expand problems list"
+                  title="Show problems"
+                >
+                  ›
+                </button>
+                {problems.map((p, i) => (
+                  <button
+                    key={p.id}
+                    className={
+                      "rail-item" + (p.id === selectedId ? " selected" : "")
+                    }
+                    onClick={() => selectProblem(p.id)}
+                    title={p.title}
+                  >
+                    {p.status === "Submitted" ? "✓" : i + 1}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* RIGHT: the selected problem */}
@@ -233,64 +290,130 @@ function App() {
               </p>
             </div>
 
-            <div className="work-grid">
-              {/* editor */}
-              <div className="editor-column">
-                <div className="editor-card">
-                  <div className="editor-header">
-                    <span className="file-name">{problem.functionName}.js</span>
-                    <div className="editor-actions">
-                      <button
-                        className="btn btn-run"
-                        onClick={runCode}
-                        disabled={isSubmitted}
-                      >
-                        Run ▶
-                      </button>
-                      <button
-                        className="btn btn-run"
-                        onClick={runAllTests}
-                        disabled={isSubmitted}
-                      >
-                        Run tests
-                      </button>
-                      <button
-                        className="btn btn-submit"
-                        onClick={submit}
-                        disabled={isSubmitted}
-                      >
-                        {isSubmitted ? "Submitted" : "Submit"}
-                      </button>
+            <div className="editor-column">
+              <div className="editor-card">
+                <div className="editor-header">
+                  <span className="file-name">{problem.functionName}.js</span>
+                  <div className="editor-actions">
+                    <button
+                      className="btn btn-run"
+                      onClick={runCode}
+                      disabled={isSubmitted}
+                    >
+                      Run ▶
+                    </button>
+                    <button
+                      className="btn btn-run"
+                      onClick={runAllTests}
+                      disabled={isSubmitted}
+                    >
+                      Run tests
+                    </button>
+                    <button
+                      className="btn btn-submit"
+                      onClick={submit}
+                      disabled={isSubmitted}
+                    >
+                      {isSubmitted ? "Submitted" : "Submit"}
+                    </button>
+                  </div>
+                </div>
+
+                {/* drag the bottom-right corner of this box to make the editor taller */}
+                <div className="editor-body">
+                  <Editor
+                    height="100%"
+                    theme="indigo-night"
+                    defaultLanguage="javascript"
+                    beforeMount={setupTheme}
+                    onMount={handleMount}
+                    value={problem.code}
+                    onChange={(value) =>
+                      updateProblem(problem.id, { code: value })
+                    }
+                    options={{
+                      fontFamily: '"DM Mono", monospace',
+                      fontSize: 14,
+                      minimap: { enabled: false },
+                      padding: { top: 16 },
+                      scrollBeyondLastLine: false,
+                      automaticLayout: true,
+                      readOnly: isSubmitted,
+                    }}
+                  />
+                </div>
+
+                {/* test cases and console, at the bottom of the editor like v2 */}
+                <div className="test-panel">
+                  <div className="test-heading">
+                    <button
+                      className={bottomTab === "tests" ? "active" : ""}
+                      onClick={() => setBottomTab("tests")}
+                    >
+                      Test cases
+                    </button>
+                    <button
+                      className={bottomTab === "console" ? "active" : ""}
+                      onClick={() => setBottomTab("console")}
+                    >
+                      Console
+                    </button>
+                    <span className="test-count">
+                      {problem.testResults
+                        ? passedCount + "/" + problem.tests.length + " passed"
+                        : "Not run yet"}
+                    </span>
+                  </div>
+
+                  {bottomTab === "tests" ? (
+                    <div className="test-body">
+                      <div className="test-tabs">
+                        {problem.tests.map((test, i) => {
+                          const result = problem.testResults
+                            ? problem.testResults[i]
+                            : null;
+                          return (
+                            <button
+                              key={i}
+                              className={activeCase === i ? "active" : ""}
+                              onClick={() => setActiveCase(i)}
+                            >
+                              Case {i + 1}
+                              {result && (result.passed ? " ✓" : " ✕")}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <div className="test-values">
+                        <div>
+                          <span>Input</span>
+                          <code>
+                            {formatInput(activeTest.input, problem.params)}
+                          </code>
+                        </div>
+                        <div>
+                          <span>Expected</span>
+                          <code>{show(activeTest.expected)}</code>
+                        </div>
+                        {activeResult && (
+                          <div>
+                            <span>Output</span>
+                            <code
+                              className={
+                                activeResult.passed
+                                  ? "output-success"
+                                  : "output-fail"
+                              }
+                            >
+                              {activeResult.shown}
+                            </code>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-
-                  {/* drag the bottom-right corner of this box to make the editor taller */}
-                  <div className="editor-body">
-                    <Editor
-                      height="100%"
-                      theme="indigo-night"
-                      defaultLanguage="javascript"
-                      beforeMount={setupTheme}
-                      onMount={handleMount}
-                      value={problem.code}
-                      onChange={(value) =>
-                        updateProblem(problem.id, { code: value })
-                      }
-                      options={{
-                        fontFamily: '"DM Mono", monospace',
-                        fontSize: 14,
-                        minimap: { enabled: false },
-                        padding: { top: 16 },
-                        scrollBeyondLastLine: false,
-                        automaticLayout: true,
-                        readOnly: isSubmitted,
-                      }}
-                    />
-                  </div>
-
-                  <div className="console">
-                    <p className="console-title">Console</p>
-                    <div className="console-lines">
+                  ) : (
+                    <div className="test-body console-lines">
                       {problem.consoleLines.length === 0 ? (
                         <div>Press Run to see what your code prints</div>
                       ) : (
@@ -299,64 +422,22 @@ function App() {
                         ))
                       )}
                     </div>
-                  </div>
+                  )}
                 </div>
-
-                {isSubmitted ? (
-                  <p className="status-line">
-                    <strong className="pass">Submitted.</strong> Your mentor can
-                    see your solution: {problem.result}.
-                  </p>
-                ) : (
-                  <p className="status-line">
-                    {problem.left === 0
-                      ? "Time is up. Submit what you have."
-                      : "Not submitted yet. Submit before the time runs out."}
-                  </p>
-                )}
               </div>
 
-              {/* test results */}
-              <div className="card">
-                <div className="card-heading">
-                  <h3>Test Results</h3>
-                  <span className="count">
-                    {problem.testResults
-                      ? passedCount + "/" + problem.tests.length + " passed"
-                      : "Not run yet"}
-                  </span>
-                </div>
-                <ul className="test-list">
-                  {problem.tests.map((test, i) => {
-                    const result = problem.testResults
-                      ? problem.testResults[i]
-                      : null;
-                    return (
-                      <li className="test-item" key={i}>
-                        <span
-                          className={
-                            "test-mark " +
-                            (result ? (result.passed ? "pass" : "fail") : "")
-                          }
-                        >
-                          {result ? (result.passed ? "✓" : "✕") : "○"}
-                        </span>
-                        <div>
-                          <span className="code">
-                            {problem.functionName}({formatInput(test.input)}) →{" "}
-                            {show(test.expected)}
-                          </span>
-                          {result && !result.passed && (
-                            <span className="test-detail">
-                              Got {result.shown}
-                            </span>
-                          )}
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
+              {isSubmitted ? (
+                <p className="status-line">
+                  <strong className="pass">Submitted.</strong> Your mentor can
+                  see your solution: {problem.result}.
+                </p>
+              ) : (
+                <p className="status-line">
+                  {problem.left === 0
+                    ? "Time is up. Submit what you have."
+                    : "Not submitted yet. Submit before the time runs out."}
+                </p>
+              )}
             </div>
           </div>
         </div>
